@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     async start(controller) {
       try {
         const response = await anthropic.messages.create({
-          model: 'claude-sonnet-4-5',
+          model: 'claude-3-5-sonnet-20241022',
           max_tokens: 500,
           system: SYSTEM_PROMPT,
           messages: userMessages.map((m: { role: string; content: string }) => ({
@@ -72,13 +72,17 @@ export async function POST(req: NextRequest) {
         for await (const event of response) {
           if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
             const data = JSON.stringify({ text: event.delta.text });
-            controller.enqueue(encoder.encode(`data: ${data}\n\n`));
+            controller.enqueue(encoder.encode(`data: ${data}
+
+`));
           }
         }
       } catch (err) {
         console.error('Chat stream error:', err);
         const errData = JSON.stringify({ text: 'Sorry, I encountered an error. Please try refreshing.' });
-        controller.enqueue(encoder.encode(`data: ${errData}\n\n`));
+        controller.enqueue(encoder.encode(`data: ${errData}
+
+`));
       } finally {
         controller.close();
       }
