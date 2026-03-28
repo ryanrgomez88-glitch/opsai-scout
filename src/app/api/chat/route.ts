@@ -79,8 +79,7 @@ export async function POST(req: NextRequest) {
         }
       } catch (err) {
         console.error('Chat stream error:', err);
-        const errMsg = err instanceof Error ? err.message : String(err);
-        const errData = JSON.stringify({ text: `Error: ${errMsg}` });
+        const errData = JSON.stringify({ text: 'Sorry, I encountered an error. Please try refreshing.' });
         controller.enqueue(encoder.encode(`data: ${errData}
 
 `));
