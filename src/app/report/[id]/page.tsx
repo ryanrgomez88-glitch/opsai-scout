@@ -60,18 +60,24 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check sessionStorage for freshly generated report
-    const stored = sessionStorage.getItem(`report_${id}`);
+    // Check localStorage first (set by assessment page before navigation)
+    const stored = localStorage.getItem(`report_${id}`) || sessionStorage.getItem(`report_${id}`);
     if (stored) {
-      setReport(JSON.parse(stored));
-      setLoading(false);
-      return;
+      try {
+        setReport(JSON.parse(stored));
+        setLoading(false);
+        return;
+      } catch { /* fall through */ }
     }
-    // Fall back to API
+    // Fall back to API (for shared links / revisits)
     fetch(`/api/report/${id}`)
       .then(r => r.json())
       .then(data => {
-        setReport(data.report);
+        if (data.report) {
+          setReport(data.report);
+          // Cache locally so revisits work
+          localStorage.setItem(`report_${id}`, JSON.stringify(data.report));
+        }
         setLoading(false);
       })
       .catch(() => setLoading(false));

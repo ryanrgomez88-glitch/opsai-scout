@@ -184,6 +184,10 @@ export default function AssessmentPage() {
       });
       const data = await res.json();
       if (data.id) {
+        // Store report in localStorage BEFORE navigating so report page can read it instantly
+        if (data.report) {
+          localStorage.setItem(`report_${data.id}`, JSON.stringify(data.report));
+        }
         setAssessmentId(data.id);
         setPhase('done');
         router.push(`/report/${data.id}`);
