@@ -67,6 +67,9 @@ export async function POST(req: NextRequest) {
     .map((m: { role: string; content: string }) => `${m.role.toUpperCase()}: ${m.content}`)
     .join('\n\n');
 
+  // Inject server-side date so LLM never guesses wrong year
+  const todayDate = new Date().toISOString().split('T')[0];
+
   let reportData: Record<string, unknown> = {};
 
   try {
@@ -76,7 +79,7 @@ export async function POST(req: NextRequest) {
       system: ANALYSIS_SYSTEM,
       messages: [{
         role: 'user',
-        content: `Analyze this assessment conversation and generate the report JSON:\n\n${conversationText}\n\nCompany name if known: ${companyName || 'Unknown'}\nContact email: ${email}`,
+        content: `Analyze this assessment conversation and generate the report JSON:\n\n${conversationText}\n\nCompany name if known: ${companyName || 'Unknown'}\nContact email: ${email}\nToday's date (use this exactly in the "date" field): ${todayDate}`,
       }],
     });
 
